@@ -1,0 +1,43 @@
+create table usuario (
+	nombreusuario varchar(30),
+	nombrevisual varchar(30),
+	clave varchar(255),
+	correo varchar(255),
+	avatar varchar(255),
+	tipo varchar(1),
+	primary key(nombreusuario,correo)
+);
+
+create table lista (
+	id bigserial primary key,
+	nombre varchar(30),
+	cantidadcartas int,
+	usuariolista varchar(30),
+	correolista varchar(30),
+	foreign key (usuariolista,correolista) references usuario(nombreusuario,correo) on update cascade on delete cascade
+);
+
+create table carta (
+	id varchar(10),
+	nombre varchar(255),
+	coleccion varchar(255),
+	expansion varchar(255),
+	rareza varchar(255),
+	marcaregulacion varchar(255),
+	ilustrador varchar(255),
+	imagen varchar(255),
+	idioma varchar(255),
+	estampado varchar(255),
+	auditoriausuario varchar(30),
+	auditoriafecha timestamp,
+	primary key (id,estampado)
+);
+
+create table incluye (
+        idcarta varchar(10),
+        idlista bigint,
+		estampadocarta varchar(255),
+        primary key (idcarta,idlista,estampadocarta),
+        foreign key (idcarta,estampadocarta) references carta(id,estampado) on update cascade on delete cascade,
+        foreign key (idlista) references lista(id) on update cascade on delete cascade
+);

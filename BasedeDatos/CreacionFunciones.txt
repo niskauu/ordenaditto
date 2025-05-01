@@ -1,0 +1,328 @@
+-----
+----- INSERTS
+-----
+
+create or replace function insertar_usuario(
+		nombreusuario varchar(30),
+		nombrevisual varchar(30),
+		clave varchar(255),
+		correo varchar(255),
+		avatar varchar(255),
+		tipo varchar(1)
+) returns void as
+$$
+begin
+	insert into usuario (
+		nombreusuario,
+		nombrevisual,
+		clave,
+		correo,
+		avatar,
+		tipo
+		) values (
+		$1,$2,md5($3),$4,$5,$6);	
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_carta(
+		id varchar(10),
+		nombre varchar(255),
+		coleccion varchar(255),
+		expansion varchar(255),
+		rareza varchar(255),
+		marcaregulacion varchar(255),
+		ilustrador varchar(255),
+		imagen varchar(255),
+		idioma varchar(255),
+		estampado varchar(255)
+) returns void as
+$$
+begin
+	insert into carta (
+		id,
+		nombre,
+		coleccion,
+		expansion,
+		rareza,
+		marcaregulacion,
+		ilustrador,
+		imagen,
+		idioma,
+		estampado,
+		auditoriausuario,
+		auditoriafecha
+	) values (
+		$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CURRENT_USER,NOW()
+	);
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_lista(
+		nombre varchar(30),
+		usuario varchar(30),
+		correo varchar(255)
+) returns void as
+$$
+begin
+	insert into lista (
+		nombre,
+		cantidadcartas,
+		usuariolista,
+		correolista
+		) values (
+		$1,0,$2,$3);	
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_carta_lista(
+	idcarta varchar(10),
+	idlista lista.id%type,
+	estampadocarta varchar(255)
+) returns void as
+$$
+begin
+	insert into incluye(
+		idcarta,
+		idlista,
+		estampadocarta
+	) values (
+		$1,$2,$3
+	);
+	update lista set cantidadcartas = (select count(*) as cantidadcartas from incluye as i where i.idlista=$2) where lista.id=$2;
+end;
+$$
+language plpgsql;
+
+----
+---- BORRAR
+----
+create or replace function delete_usuario(
+		nombreusuario varchar(30)
+) returns void as
+$$
+begin
+	delete from usuario as u where u.nombreusuario=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_lista(
+		id lista.id%type
+) returns void as
+$$
+begin
+	delete from lista as l where l.id=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_carta(
+		id carta.id%type
+) returns void as
+$$
+begin
+	delete from carta as c where c.id=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function borrar_carta_lista(
+	idcarta varchar(10),
+	idlista lista.id%type
+) returns void as
+$$
+begin
+	delete from incluye as i where i.idcarta = $1 and i.idlista = $2;
+	update lista set cantidadcartas = (select count(*) as cantidadcartas from incluye as i where i.idlista=$2) where lista.id=$2;
+end;
+$$
+language plpgsql;
+
+---
+--- Mostrar
+---
+create or replace function mostrar_usuarios(
+	out nombreusuario usuario.nombreusuario%type,
+	out nombrevisual usuario.nombrevisual%type,
+	out correo usuario.correo%type,
+	out avatar usuario.avatar%type
+) returns setof record as
+$$
+begin
+	return query select u.nombreusuario,u.nombrevisual,u.correo,u.avatar from usuario as u;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_cartas(
+	out id carta.id%type,
+	out nombre carta.nombre%type,
+	out coleccion carta.coleccion%type,
+	out expansion carta.expansion%type,
+	out rareza carta.rareza%type,
+	out marcaregulacion carta.marcaregulacion%type,
+	out ilustrador carta.ilustrador%type,
+	out imagen carta.imagen%type,
+	out idioma carta.idioma%type,
+	out estampado carta.estampado%type
+) returns setof record as
+$$
+begin
+	return query select c.id, 
+						c.nombre, 
+						c.coleccion, 
+						c.expansion, 
+						c.rareza, 
+						c.marcaregulacion, 
+						c.ilustrador, 
+						c.imagen, 
+						c.idioma, 
+						c.estampado
+						from carta as c;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_listas(
+	OUT id lista.id%type,
+	OUT nombre lista.nombre%type,
+	OUT cantidadcartas lista.cantidadcartas%type,
+	OUT usuariolista lista.usuariolista%type
+) returns setof record as
+$$
+begin
+	return query select l.id,l.nombre,l.cantidadcartas,l.usuariolista from lista as l;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_contenido_lista(
+	IN idbuscar lista.id%type,
+	OUT id carta.id%type,
+	OUT nombre carta.nombre%type,
+	OUT coleccion carta.coleccion%type,
+	OUT expansion carta.expansion%type,
+	OUT rareza carta.rareza%type,
+	OUT marcaregulacion carta.marcaregulacion%type,
+	OUT ilustrador carta.ilustrador%type,
+	OUT imagen carta.imagen%type,
+	OUT idioma carta.idioma%type,
+	OUT estampado carta.estampado%type
+) returns setof record as
+$$
+begin
+	return query select c.id,c.nombre, c.coleccion,
+						c.expansion, c.rareza, c.marcaregulacion,
+						c.ilustrador, c.imagen, c.idioma, c.estampado
+						 from carta c, incluye i, lista l, usuario u
+	where i.idcarta=c.id and i.idlista=l.id and i.estampadocarta = c.estampado and l.usuariolista=u.nombreusuario and l.id=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_impresiones(
+	in id_buscar carta.id%type,
+  	out estampado carta.estampado%type
+) returns setof varchar as
+$$
+begin
+	return query (select c.estampado from carta as c where id=$1);
+end;
+$$
+language plpgsql;
+
+---
+---Modificar
+---
+create or replace function modificar_atributos_usuario(
+	nuevodato text,
+	atributo text,
+	id usuario.nombreusuario%type
+) returns void as
+$$
+begin
+	case atributo
+		when 'nombreusuario' then
+			update usuario as u set nombreusuario=cast($1 as varchar(30))
+			where u.nombreusuario=$3;
+		when 'nombrevisual' then 
+			update usuario as u set nombrevisual=cast($1 as varchar(30))
+			where u.nombreusuario=$3;
+		when 'correo' then 
+			update usuario as u set correo=cast($1 as varchar(255))
+			where u.nombreusuario=$3;
+		when 'avatar' then
+			update usuario as u set avatar=cast($1 as varchar(255))
+			where u.nombreusuario=$3;
+		else
+			raise notice 'Debe especificar un atributo';
+	end case;
+end;
+$$
+language plpgsql;
+
+create or replace function modificar_atributos_lista(
+	nuevodato text,
+	atributo text,
+	id lista.id%type
+) returns void as
+$$
+begin
+	case atributo
+		when 'nombre' then
+			update lista as l set nombre=cast($1 as varchar(30))
+			where l.id=$3;
+		else
+			raise notice 'Debe especificar un atributo';
+	end case;
+end;
+$$
+language plpgsql;
+
+create or replace function modificar_atributos_carta(
+	nuevodato text,
+	atributo text,
+	id carta.id%type
+) returns void as
+$$
+begin
+	case atributo
+		when 'id' then
+			update carta as c set id=cast($1 as varchar(10))
+			where c.id=$3;
+		when 'nombre' then
+			update carta as c set nombre=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'coleccion' then
+			update carta as c set coleccion=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'expansion' then
+			update carta as c set expansion=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'rareza' then
+			update carta as c set rareza=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'marcaregulacion' then
+			update carta as c set marcaregulacion=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'ilustrador' then
+			update carta as c set ilustrador=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'imagen' then
+			update carta as c set imagen=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'idioma' then
+			update carta as c set idioma=cast($1 as varchar(255))
+			where c.id=$3;
+		when 'estampado' then
+			update carta as c set estampado=cast($1 as varchar(255))
+			where c.id=$3;
+		else
+			raise notice 'Debe especificar un atributo';
+	end case;
+end;
+$$
+language plpgsql;
