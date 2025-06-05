@@ -5,7 +5,7 @@
         <title>Ordenaditto</title>
     </head>
     <h1>Ordenaditto</h1>
-    <a href="../login.php">Iniciar sesion</a>
+    <a href="../login.php">Iniciar sesi&oacute;n</a>
     <a href="explore.php">Explorar</a>
         <div>
         <?php 
@@ -16,4 +16,5 @@
             }
         ?>
         </div>
+        <a href="../index.php">Volver</a>
 </html>

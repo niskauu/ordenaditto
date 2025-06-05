@@ -16,11 +16,13 @@
         echo $_SESSION['name'];
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
-    <form action="add-lista-check.php" method="post">
-        Nombre de la nueva lista: 
+    <form action="cambiar-nombre-lista-check.php" method="post">
+        <?php
+        echo "<input type='hidden' name='idlista' value='".$_POST['idlista']."'/>"
+        ?>
+        Nuevo nombre para la lista: 
         <input type="text" name="nombrelista"/> 
-        <input type="submit" value="Agregar"/>
+        <input type="submit" value="Editar"/>
     </form>
     <a href="../user/dashboard.php">Volver</a>
-
 </html>

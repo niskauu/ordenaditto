@@ -10,8 +10,12 @@
     <h1>Ordenaditto</h1>
     <a href="dashboard.php">Inicio</a>
     <a href="explore.php">Explorar</a>
-    <a href="logout.php">Cerrar sesion</a>
-    Bienvenido <?php echo $_SESSION['user_id']?>
+    <a href="logout.php">Cerrar sesi&oacute;n</a>
+    Bienvenido 
+    <?php 
+        echo $_SESSION['name'];
+        echo " <img src='".$_SESSION['avatar']."' width='30'>";
+    ?>
         <div>
         <?php 
             $consulta = pg_exec("select id, nombre, imagen from mostrar_cartas() where id='".$_GET['id']."';") or die("Consulta fallida");
@@ -20,15 +24,20 @@
             echo "<p>ID ".$contenido['id']."</p>";
             echo "<p>Nombre ".$contenido['nombre']."</p>";
             echo "<p>Impresiones </p>";
-            $estampados = pg_exec("select estampado from mostrar_cartas() where id='".$_GET['id']."';") or die("Consulta fallida");
+            $estampados = pg_exec("select distinct estampado from mostrar_cartas() where id='".$_GET['id']."';") or die("Consulta fallida");
             while ($estampado = pg_fetch_assoc($estampados)) {
                 echo $estampado['estampado']." ";
             }
-            echo "<form action='add-carta.php' method='post'>
+            echo "<form action='add-carta-lista.php' method='post'>
                     <input type='hidden' name='idcarta' value='".$contenido['id']."'/>
                     <input type='submit' value='Agregar a una lista' id='hyperlink-style-button'/>
+                </form>";
+            echo "<form action='baraja/add-carta-baraja.php' method='post'>
+                    <input type='hidden' name='idcarta' value='".$contenido['id']."'/>
+                    <input type='submit' value='Agregar a una baraja' id='hyperlink-style-button'/>
                 </form>";
 
         ?>
         </div>
+        <a href="../user/explore.php">Volver</a>
 </html>

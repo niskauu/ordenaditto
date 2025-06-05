@@ -10,8 +10,12 @@
     <h1>Ordenaditto</h1>
     <a href="dashboard.php">Inicio</a>
     <a href="explore.php">Explorar</a>
-    <a href="logout.php">Cerrar sesion</a>
-    Bienvenido <?php echo $_SESSION['user_id']?>
+    <a href="logout.php">Cerrar sesi&oacute;n</a>
+    Bienvenido 
+    <?php 
+        echo $_SESSION['name'];
+        echo " <img src='".$_SESSION['avatar']."' width='30'>";
+    ?>
         <div>
         <?php 
             $consulta = pg_exec("select distinct id, nombre, imagen from mostrar_cartas() order by id") or die("Consulta fallida");
@@ -21,4 +25,5 @@
             }
         ?>
         </div>
+        <a href="../user/dashboard.php">Volver</a>
 </html>

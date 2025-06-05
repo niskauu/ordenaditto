@@ -5,7 +5,7 @@ create table usuario (
 	correo varchar(255),
 	avatar varchar(255),
 	tipo varchar(1),
-	primary key(nombreusuario,correo)
+	primary key(nombreusuario,correo,tipo)
 );
 
 create table lista (
@@ -13,14 +13,21 @@ create table lista (
 	nombre varchar(30),
 	cantidadcartas int,
 	usuariolista varchar(30),
-	correolista varchar(30),
-	foreign key (usuariolista,correolista) references usuario(nombreusuario,correo) on update cascade on delete cascade
+	correolista varchar(255),
+	tipousuariolista varchar(1),
+	foreign key (usuariolista,correolista,tipousuariolista) references usuario(nombreusuario,correo,tipo) on update cascade on delete cascade
+);
+
+create table coleccion (
+	nombre varchar(255) primary key,
+	auditoriausuario varchar(30),
+	auditoriafecha timestamp
 );
 
 create table carta (
 	id varchar(10),
 	nombre varchar(255),
-	coleccion varchar(255),
+	nombrecoleccion varchar(255),
 	expansion varchar(255),
 	rareza varchar(255),
 	marcaregulacion varchar(255),
@@ -30,14 +37,37 @@ create table carta (
 	estampado varchar(255),
 	auditoriausuario varchar(30),
 	auditoriafecha timestamp,
-	primary key (id,estampado)
+	primary key (id,estampado,idioma),
+	foreign key (nombrecoleccion) references coleccion(nombre) on update cascade on delete cascade
 );
 
-create table incluye (
+create table incluyelista (
         idcarta varchar(10),
         idlista bigint,
 		estampadocarta varchar(255),
-        primary key (idcarta,idlista,estampadocarta),
-        foreign key (idcarta,estampadocarta) references carta(id,estampado) on update cascade on delete cascade,
+		idiomacarta varchar(255),
+        primary key (idcarta,idlista,estampadocarta,idiomacarta),
+        foreign key (idcarta,estampadocarta,idiomacarta) references carta(id,estampado,idioma) on update cascade on delete cascade,
         foreign key (idlista) references lista(id) on update cascade on delete cascade
+);
+
+create table baraja (
+	id bigserial primary key,
+	nombre varchar(30),
+	cantidadcartas int,
+	usuariobaraja varchar(30),
+	correobaraja varchar(255),
+	tipousuariobaraja varchar(1),
+	foreign key (usuariobaraja,correobaraja,tipousuariobaraja) references usuario(nombreusuario,correo,tipo) on update cascade on delete cascade
+);
+
+create table incluyebaraja (
+        idcarta varchar(10),
+        idbaraja bigint,
+		estampadocarta varchar(255),
+		idiomacarta varchar(255),
+		cantidadcopias int,
+        primary key (idcarta,idbaraja,estampadocarta,idiomacarta),
+        foreign key (idcarta,estampadocarta,idiomacarta) references carta(id,estampado,idioma) on update cascade on delete cascade,
+        foreign key (idbaraja) references baraja(id) on update cascade on delete cascade
 );

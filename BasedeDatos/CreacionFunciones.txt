@@ -2,6 +2,100 @@
 ----- INSERTS
 -----
 
+create or replace function insertar_baraja(
+		nombre varchar(30),
+		usuario varchar(30),
+		correo varchar(255),
+		tipousuario varchar(1)
+) returns void as
+$$
+begin
+	insert into baraja (
+		nombre,
+		cantidadcartas,
+		usuariobaraja,
+		correobaraja,
+		tipousuariobaraja
+		) values (
+		$1,0,$2,$3,$4);	
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_carta_baraja_noenergia(
+	idcarta varchar(10),
+	idbaraja lista.id%type,
+	estampadocarta varchar(255),
+	idioma varchar(255),
+	cantidad integer
+) returns integer as
+$$
+declare
+	aux integer;
+  	resultado integer;
+begin
+	if exists(select i.idcarta,i.estampadocarta,i.idiomacarta from incluyebaraja as i where i.idcarta=$1 and i.estampadocarta=$3 and i.idiomacarta=$4) then
+		select cantidadcopias from incluyebaraja as i where i.idcarta=$1 and i.idbaraja=$2 and i.estampadocarta=$3 and i.idiomacarta=$4 into aux;
+		if ((aux+$5) <= 4) then
+			update incluyebaraja set cantidadcopias=cantidad+aux where incluyebaraja.idcarta=$1 and incluyebaraja.idbaraja=$2 and incluyebaraja.estampadocarta=$3 and incluyebaraja.idiomacarta=$4;
+			select sum(cantidadcopias) from incluyebaraja as i where i.idbaraja=$2 into aux;
+			update baraja set cantidadcartas = aux where baraja.id=$2;
+			resultado := 1;
+		else
+			resultado := 0;
+		end if;
+	else
+		insert into incluyebaraja(
+			idcarta,
+			idbaraja,
+			estampadocarta,
+			idiomacarta,
+			cantidadcopias
+		) values (
+			$1,$2,$3,$4,$5
+		);
+		select sum(i.cantidadcopias) from incluyebaraja as i where i.idbaraja=$2 into aux;
+		update baraja set cantidadcartas = aux where baraja.id=$2;
+		resultado := 1;
+	end if;
+  return resultado;
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_carta_baraja_energia(
+	idcarta varchar(10),
+	idbaraja baraja.id%type,
+	estampadocarta varchar(255),
+	idioma varchar(255),
+	cantidad int
+) returns void as
+$$
+declare
+	aux int;
+begin
+	if exists(select i.idcarta,i.estampadocarta,i.idiomacarta from incluyebaraja as i where i.idcarta=$1 and i.estampadocarta=$3 and i.idiomacarta=$4) then
+		select cantidadcopias from incluyebaraja as i where i.idcarta=$1 and i.idbaraja=$2 and i.estampadocarta=$3 and i.idiomacarta=$4 into aux;
+		update incluyebaraja set cantidadcopias=cantidad+aux where incluyebaraja.idcarta=$1 and incluyebaraja.idbaraja=$2 and incluyebaraja.estampadocarta=$3 and incluyebaraja.idiomacarta=$4;
+		select sum(cantidadcopias) from incluyebaraja as i where i.idbaraja=$2 into aux;
+		update baraja set cantidadcartas = aux where baraja.id=$2;
+	else
+		insert into incluyebaraja(
+			idcarta,
+			idbaraja,
+			estampadocarta,
+			idiomacarta,
+			cantidadcopias
+		) values (
+			$1,$2,$3,$4,$5
+		);
+		select sum(i.cantidadcopias) from incluyebaraja as i where i.idbaraja=$2 into aux;
+		update baraja set cantidadcartas = aux where baraja.id=$2;
+	end if;
+end;
+$$
+language plpgsql;
+
 create or replace function insertar_usuario(
 		nombreusuario varchar(30),
 		nombrevisual varchar(30),
@@ -25,6 +119,24 @@ end;
 $$
 language plpgsql;
 
+create or replace function insertar_coleccion(
+	nombre varchar(255),
+	usuario varchar(255)
+) returns void as
+$$
+begin
+	insert into coleccion (
+		nombre,
+		auditoriausuario,
+		auditoriafecha
+	) values (
+		$1,$2,NOW()
+	);
+end;
+$$
+language plpgsql;
+
+
 create or replace function insertar_carta(
 		id varchar(10),
 		nombre varchar(255),
@@ -35,14 +147,15 @@ create or replace function insertar_carta(
 		ilustrador varchar(255),
 		imagen varchar(255),
 		idioma varchar(255),
-		estampado varchar(255)
+		estampado varchar(255),
+		auditoriausuario varchar(255)
 ) returns void as
 $$
 begin
 	insert into carta (
 		id,
 		nombre,
-		coleccion,
+		nombrecoleccion,
 		expansion,
 		rareza,
 		marcaregulacion,
@@ -53,7 +166,7 @@ begin
 		auditoriausuario,
 		auditoriafecha
 	) values (
-		$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CURRENT_USER,NOW()
+		$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()
 	);
 end;
 $$
@@ -62,7 +175,8 @@ language plpgsql;
 create or replace function insertar_lista(
 		nombre varchar(30),
 		usuario varchar(30),
-		correo varchar(255)
+		correo varchar(255),
+		tipousuario varchar(1)
 ) returns void as
 $$
 begin
@@ -70,9 +184,10 @@ begin
 		nombre,
 		cantidadcartas,
 		usuariolista,
-		correolista
+		correolista,
+		tipousuariolista
 		) values (
-		$1,0,$2,$3);	
+		$1,0,$2,$3,$4);	
 end;
 $$
 language plpgsql;
@@ -80,18 +195,20 @@ language plpgsql;
 create or replace function insertar_carta_lista(
 	idcarta varchar(10),
 	idlista lista.id%type,
-	estampadocarta varchar(255)
+	estampadocarta varchar(255),
+	idioma varchar(255)
 ) returns void as
 $$
 begin
-	insert into incluye(
+	insert into incluyelista(
 		idcarta,
 		idlista,
-		estampadocarta
+		estampadocarta,
+		idiomacarta
 	) values (
-		$1,$2,$3
+		$1,$2,$3,$4
 	);
-	update lista set cantidadcartas = (select count(*) as cantidadcartas from incluye as i where i.idlista=$2) where lista.id=$2;
+	update lista set cantidadcartas = (select count(*) as cantidadcartas from incluyelista as i where i.idlista=$2) where lista.id=$2;
 end;
 $$
 language plpgsql;
@@ -100,11 +217,13 @@ language plpgsql;
 ---- BORRAR
 ----
 create or replace function delete_usuario(
-		nombreusuario varchar(30)
+		nombreusuario varchar(30),
+		correo varchar(255),
+		tipo varchar(1)
 ) returns void as
 $$
 begin
-	delete from usuario as u where u.nombreusuario=$1;
+	delete from usuario as u where u.nombreusuario=$1 and u.correo=$2 and u.tipo=$3;
 end;
 $$
 language plpgsql;
@@ -120,23 +239,87 @@ $$
 language plpgsql;
 
 create or replace function delete_carta(
-		id carta.id%type
+		id carta.id%type,
+		idioma carta.idioma%type,
+		estampado carta.estampado%type
 ) returns void as
 $$
 begin
-	delete from carta as c where c.id=$1;
+	delete from carta as c where c.id=$1 and c.idioma=$2 and c.estampado=$3;
 end;
 $$
 language plpgsql;
 
 create or replace function borrar_carta_lista(
 	idcarta varchar(10),
+	estampadocarta varchar(255),
+	idiomacarta varchar(255),
 	idlista lista.id%type
 ) returns void as
 $$
 begin
-	delete from incluye as i where i.idcarta = $1 and i.idlista = $2;
-	update lista set cantidadcartas = (select count(*) as cantidadcartas from incluye as i where i.idlista=$2) where lista.id=$2;
+	delete from incluyelista as i where i.idcarta = $1 and i.estampadocarta=$2 and i.idiomacarta=$3 and i.idlista = $4;
+	update lista set cantidadcartas = (select count(*) as cantidadcartas from incluyelista as i where i.idlista=$4) where lista.id=$4;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_coleccion(
+		nombre coleccion.nombre%type
+) returns void as
+$$
+begin
+	delete from coleccion as c where c.nombre=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_baraja(
+		id baraja.id%type
+) returns void as
+$$
+begin
+	delete from baraja as b where b.id=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function borrar_carta_baraja(
+	idcarta varchar(10),
+	estampadocarta varchar(255),
+	idiomacarta varchar(255),
+	idbaraja baraja.id%type,
+	cantidad int
+) returns void as
+$$
+declare
+	copiasenbaraja int;
+	cantidadfinal int;
+begin
+	select cantidadcopias from (select cantidadcopias from incluyebaraja as i where i.idcarta=$1 and i.estampadocarta=$2 and i.idiomacarta=$3 and i.idbaraja=$4) into copiasenbaraja;
+	if ($5 < copiasenbaraja) then
+		update incluyebaraja as i set cantidadcopias=(copiasenbaraja - $5) where i.idbaraja=$4 and i.idcarta=$1 and i.estampadocarta=$2 and i.idiomacarta=$3;
+		cantidadfinal := (select sum(cantidadcopias) from incluyebaraja as i where i.idbaraja = $4);
+		update baraja as b set cantidadcartas = cantidadfinal where b.id=$4;
+	else
+		delete from incluyebaraja as i where i.idcarta = $1 and i.estampadocarta=$2 and i.idiomacarta=$3 and i.idbaraja = $4;
+		cantidadfinal := (select sum(cantidadcopias) from incluyebaraja as i where i.idbaraja = $4);
+		if (cantidadfinal is NULL) then
+			update baraja as b set cantidadcartas = 0 where b.id=$4;
+		else
+			update baraja as b set cantidadcartas = cantidadfinal where b.id=$4;
+		end if;
+	end if;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_coleccion(
+		nombre coleccion.nombre%type
+) returns void as
+$$
+begin
+	delete from coleccion as c where c.nombre=$1;
 end;
 $$
 language plpgsql;
@@ -148,11 +331,12 @@ create or replace function mostrar_usuarios(
 	out nombreusuario usuario.nombreusuario%type,
 	out nombrevisual usuario.nombrevisual%type,
 	out correo usuario.correo%type,
-	out avatar usuario.avatar%type
+	out avatar usuario.avatar%type,
+	out tipo usuario.tipo%type
 ) returns setof record as
 $$
 begin
-	return query select u.nombreusuario,u.nombrevisual,u.correo,u.avatar from usuario as u;
+	return query select u.nombreusuario,u.nombrevisual,u.correo,u.avatar, u.tipo from usuario as u;
 end;
 $$
 language plpgsql;
@@ -160,7 +344,7 @@ language plpgsql;
 create or replace function mostrar_cartas(
 	out id carta.id%type,
 	out nombre carta.nombre%type,
-	out coleccion carta.coleccion%type,
+	out coleccion carta.nombrecoleccion%type,
 	out expansion carta.expansion%type,
 	out rareza carta.rareza%type,
 	out marcaregulacion carta.marcaregulacion%type,
@@ -173,7 +357,7 @@ $$
 begin
 	return query select c.id, 
 						c.nombre, 
-						c.coleccion, 
+						c.nombrecoleccion, 
 						c.expansion, 
 						c.rareza, 
 						c.marcaregulacion, 
@@ -199,11 +383,24 @@ end;
 $$
 language plpgsql;
 
+create or replace function mostrar_barajas(
+	OUT id baraja.id%type,
+	OUT nombre baraja.nombre%type,
+	OUT cantidadcartas baraja.cantidadcartas%type,
+	OUT usuariobaraja baraja.usuariobaraja%type
+) returns setof record as
+$$
+begin
+	return query select b.id,b.nombre,b.cantidadcartas,b.usuariobaraja from baraja as b;
+end;
+$$
+language plpgsql;
+
 create or replace function mostrar_contenido_lista(
 	IN idbuscar lista.id%type,
 	OUT id carta.id%type,
 	OUT nombre carta.nombre%type,
-	OUT coleccion carta.coleccion%type,
+	OUT coleccion carta.nombrecoleccion%type,
 	OUT expansion carta.expansion%type,
 	OUT rareza carta.rareza%type,
 	OUT marcaregulacion carta.marcaregulacion%type,
@@ -214,11 +411,11 @@ create or replace function mostrar_contenido_lista(
 ) returns setof record as
 $$
 begin
-	return query select c.id,c.nombre, c.coleccion,
+	return query select c.id,c.nombre, c.nombrecoleccion,
 						c.expansion, c.rareza, c.marcaregulacion,
 						c.ilustrador, c.imagen, c.idioma, c.estampado
-						 from carta c, incluye i, lista l, usuario u
-	where i.idcarta=c.id and i.idlista=l.id and i.estampadocarta = c.estampado and l.usuariolista=u.nombreusuario and l.id=$1;
+						from carta c, incluyelista i
+	where i.idlista=$1 and i.idcarta=c.id and i.idiomacarta=c.idioma and i.estampadocarta=c.estampado;
 end;
 $$
 language plpgsql;
@@ -230,6 +427,43 @@ create or replace function mostrar_impresiones(
 $$
 begin
 	return query (select c.estampado from carta as c where id=$1);
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_colecciones(
+	out nombre coleccion.nombre%type,
+	out auditoriausuario coleccion.auditoriausuario%type,
+	out auditoriafecha coleccion.auditoriafecha%type
+) returns setof record as
+$$
+begin
+	return query select c.nombre, c.auditoriausuario, c.auditoriafecha from coleccion as c;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_contenido_baraja(
+	IN idbuscar baraja.id%type,
+	OUT id carta.id%type,
+	OUT nombre carta.nombre%type,
+	OUT coleccion carta.nombrecoleccion%type,
+	OUT expansion carta.expansion%type,
+	OUT rareza carta.rareza%type,
+	OUT marcaregulacion carta.marcaregulacion%type,
+	OUT ilustrador carta.ilustrador%type,
+	OUT imagen carta.imagen%type,
+	OUT idioma carta.idioma%type,
+	OUT estampado carta.estampado%type,
+	OUT cantidadcopias incluyebaraja.cantidadcopias%type
+) returns setof record as
+$$
+begin
+	return query select c.id,c.nombre, c.nombrecoleccion,
+						c.expansion, c.rareza, c.marcaregulacion,
+						c.ilustrador, c.imagen, c.idioma, c.estampado, i.cantidadcopias
+						from carta c, incluyebaraja i
+	where i.idbaraja=$1 and i.idcarta=c.id and i.idiomacarta=c.idioma and i.estampadocarta=c.estampado;
 end;
 $$
 language plpgsql;
@@ -285,44 +519,181 @@ language plpgsql;
 create or replace function modificar_atributos_carta(
 	nuevodato text,
 	atributo text,
-	id carta.id%type
+	id carta.id%type,
+	idioma carta.idioma%type,
+	estampado carta.estampado%type
 ) returns void as
 $$
 begin
 	case atributo
 		when 'id' then
 			update carta as c set id=cast($1 as varchar(10))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'nombre' then
 			update carta as c set nombre=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'coleccion' then
-			update carta as c set coleccion=cast($1 as varchar(255))
-			where c.id=$3;
+			update carta as c set nombrecoleccion=cast($1 as varchar(255))
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'expansion' then
 			update carta as c set expansion=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'rareza' then
 			update carta as c set rareza=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'marcaregulacion' then
 			update carta as c set marcaregulacion=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'ilustrador' then
 			update carta as c set ilustrador=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'imagen' then
 			update carta as c set imagen=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'idioma' then
 			update carta as c set idioma=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'estampado' then
 			update carta as c set estampado=cast($1 as varchar(255))
-			where c.id=$3;
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		else
 			raise notice 'Debe especificar un atributo';
 	end case;
+end;
+$$
+language plpgsql;
+
+create or replace function cambiar_nombre_lista(
+  id_lista_cambiar lista.id%type, 
+  nuevo_nombre lista.nombre%type
+) returns void as
+$$
+begin
+	update lista as l set nombre=$2
+  where id=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function cambiar_nombre_baraja(
+  id_baraja_cambiar baraja.id%type, 
+  nuevo_nombre baraja.nombre%type
+) returns void as
+$$
+begin
+	update baraja as b set nombre=$2
+  where id=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function cambiar_nombre_coleccion(
+  nombre_coleccion_cambiar coleccion.nombre%type, 
+  nuevo_nombre coleccion.nombre%type
+) returns void as
+$$
+begin
+	update coleccion as c set nombre=$2
+  where nombre=$1;
+end;
+$$
+language plpgsql;
+
+
+---
+---BUSCAR
+---
+create or replace function buscar_carta_en_lista(
+	idcarta carta.id%type,
+  estampadocarta carta.estampado%type,
+  idiomacarta carta.idioma%type,
+  idlista lista.id%type
+) returns int as 
+$$
+declare
+	existe int;
+begin
+	select count(*) as cantidad from incluyelista as i where 
+	i.idcarta=$1 and i.idlista=$4 and i.estampadocarta=$2 and i.idiomacarta=$3 into existe;
+  if existe > 0 then
+  	return 1;
+  else
+  	return 0;
+  end if;
+end;
+$$
+language plpgsql;
+
+create or replace function buscar_coleccion(
+	nombre coleccion.nombre%type
+) returns int as 
+$$
+declare
+	existe int;
+begin
+	select count(*) as cantidad from coleccion as c where 
+	c.nombre=$1 into existe;
+  if existe > 0 then
+  	return 1;
+  else
+  	return 0;
+  end if;
+end;
+$$
+language plpgsql;
+
+
+create or replace function buscar_carta_en_sistema(
+	idcarta carta.id%type,
+	estampadocarta carta.estampado%type,
+	idiomacarta carta.idioma%type
+) returns int as 
+$$
+declare
+	existe int;
+begin
+	select count(*) as cantidad from carta as c where 
+	c.id=$1 and c.estampado=$2 and c.idioma=$3 into existe;
+  if existe > 0 then
+  	return 1;
+  else
+  	return 0;
+  end if;
+end;
+$$
+language plpgsql;
+
+
+create or replace function check_limite_barajas(
+	idbaraja baraja.id%type
+) returns int as
+$$
+begin
+	if (select cantidadcartas from baraja where id=$1) < 60 then
+		return 1; 
+	else
+		return 0;
+	end if;
+end;
+$$
+language plpgsql;
+
+create or replace function buscar_usuario_en_sistema(
+	nombreusuariobuscar usuario.nombreusuario%type,
+	correobuscar usuario.correo%type,
+	tipousuariobuscar usuario.tipo%type
+) returns int as 
+$$
+declare
+	existe int;
+begin
+	select count(*) as cantidad from usuario as u where 
+	u.nombreusuario=$1 and u.correo=$2 and u.tipo=$3 into existe;
+  if existe > 0 then
+  	return 1;
+  else
+  	return 0;
+  end if;
 end;
 $$
 language plpgsql;
