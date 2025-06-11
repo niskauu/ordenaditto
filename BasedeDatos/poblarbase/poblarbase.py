@@ -7,14 +7,14 @@ from pokemontcgsdk import Card, Set
 import psycopg2
 
 conn = psycopg2.connect(database = "ordenaditto", 
-                        user = "", 
+                        user = "vicho", 
                         host= 'localhost',
                         password = "",
                         port = 5432)
 
 cur = conn.cursor()
 
-RestClient.configure('')
+RestClient.configure('4adca126-36ca-43d9-a1af-c7300f6dc584')
 
 cards = Card.where(q='set.id:sv2')
 collection = Set.find('sv2')
