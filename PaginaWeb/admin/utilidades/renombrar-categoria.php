@@ -16,12 +16,12 @@
         echo $_SESSION['name'];
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
-    <h2>Renombrar colecciones</h2>
-    <form action="renombrar-coleccion-check.php" method="post">
+    <h2>Renombrar categorias</h2>
+    <form action="renombrar-categoria-check.php" method="post">
         <div>
-            <select name="coleccion">
+            <select name="categoria">
                 <?php 
-                    $consulta = pg_exec("select nombre from mostrar_colecciones()") or die("Consulta fallida");
+                    $consulta = pg_exec("select nombre from mostrar_categorias()") or die("Consulta fallida");
                     while ($contenido = pg_fetch_assoc($consulta)) {
                         echo "<option value='".$contenido['nombre']."'>".ucwords($contenido['nombre'])."</option>";
                     }
@@ -29,7 +29,7 @@
             </select>
             Nuevo nombre: 
             <input type="text" name="nuevonombre">
-            <input type="submit" value="Borrar">
+            <input type="submit" value="Modificar">
         </div>
     </form>
     <a href="../dashboard.php">Volver</a>

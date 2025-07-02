@@ -26,11 +26,12 @@
                     while ($contenido = pg_fetch_assoc($consulta)) {
                         echo "<option value='".$contenido['id']."?".$contenido['idioma']."?".$contenido['estampado']."'>
                         ID: ".$contenido['id']." Nombre: ".$contenido['nombre']." 
-                        Colecci&oacute;n: ".$contenido['coleccion']." 
-                        Expansi&oacute;n: ".$contenido['expansion']." 
+                        Set: ".$contenido['nombreset']." 
+                        Categoria: ".$contenido['nombrecategoria']." 
+                        Ilustrador: ".$contenido['nombreilustrador']." 
+                        Serie: ".$contenido['nombreserie']."
                         Rareza: ".$contenido['rareza']." 
                         Marca de Regulaci&oacute;n: ".$contenido['marcaregulacion']." 
-                        Ilustrador: ".$contenido['ilustrador']." 
                         Imagen: ".$contenido['imagen']." 
                         Idioma: ".$contenido['idioma']." 
                         Estampado: ".$contenido['estampado']."</option>";

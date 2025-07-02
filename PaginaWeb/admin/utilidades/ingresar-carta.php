@@ -23,23 +23,37 @@
             <input type="text" name="id">
             Nombre: 
             <input type="text" name="nombre">
-            Colecci&oacute;n:
-            <select name="coleccion"> 
+            Set: 
+            <select name=set>
             <?php
-                $consulta = pg_exec("select nombre from mostrar_colecciones();") or die('Consulta fallida');
+                $consulta = pg_exec("select nombre from mostrar_sets();") or die('Consulta fallida');
                 while ($contenido = pg_fetch_assoc($consulta)) {
                         echo "<option value='".$contenido['nombre']."'>".ucwords($contenido['nombre'])."</option>";
                     }
             ?>
             </select>
-            Expansi&oacute;n: 
-            <input type="text" name="expansion">
+            Categoria: 
+            <select name=categoria>
+            <?php
+                $consulta = pg_exec("select nombre from mostrar_categorias();") or die('Consulta fallida');
+                while ($contenido = pg_fetch_assoc($consulta)) {
+                        echo "<option value='".$contenido['nombre']."'>".ucwords($contenido['nombre'])."</option>";
+                    }
+            ?>
+            </select>
             Rareza: 
             <input type="text" name="rareza">
             Marca de regulaci&oacute;n: 
             <input type="text" name="marcaderegulacion">
             Ilustrador: 
-            <input type="text" name="ilustrador">
+            <select name=ilustrador>
+            <?php
+                $consulta = pg_exec("select nombre from mostrar_ilustradores();") or die('Consulta fallida');
+                while ($contenido = pg_fetch_assoc($consulta)) {
+                        echo "<option value='".$contenido['nombre']."'>".ucwords($contenido['nombre'])."</option>";
+                    }
+            ?>
+            </select>
             Imagen: 
             <input type="text" name="imagen">
             Idioma: 

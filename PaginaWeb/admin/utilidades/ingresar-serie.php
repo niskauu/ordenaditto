@@ -16,8 +16,8 @@
         echo $_SESSION['name'];
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
-    <h2>Ingresar nueva colecci&oacute;n</h2>
-    <form action="ingresar-coleccion-check.php" method="post">
+    <h2>Ingresar nueva serie</h2>
+    <form action="ingresar-serie-check.php" method="post">
         <div>
             Nombre
             <input type="text" name="nombre">

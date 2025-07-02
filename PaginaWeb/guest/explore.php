@@ -6,6 +6,7 @@
     </head>
     <h1>Ordenaditto</h1>
     <a href="../login.php">Iniciar sesi&oacute;n</a>
+    <a href="../register.php">Registrarse</a>
     <a href="explore.php">Explorar</a>
         <div>
         <?php 

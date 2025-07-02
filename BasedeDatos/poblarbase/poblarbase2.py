@@ -17,12 +17,12 @@ cur = conn.cursor()
 
 RestClient.configure('')
 
-cards = Card.where(q='set.id:sv2')
-collection = Set.find('sv2')
-cur.callproc('insertar_serie', [str(collection.series).lower(),'pgscript'])
+cards = Card.where(q='set.id:sv3')
+collection = Set.find('sv3')
+# cur.callproc('insertar_serie', [str(collection.series).lower(),'pgscript'])
 cur.callproc('insertar_set', [str(collection.name).lower(),str(collection.series).lower(),'pgscript'])
 
-energy = 0
+energy = 1
 
 for card in cards:
     printing = card.tcgplayer.prices.__dict__

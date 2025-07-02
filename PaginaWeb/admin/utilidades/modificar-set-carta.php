@@ -17,29 +17,30 @@
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
     <h2>Modificar una carta</h2>
-    <form action="modificar-coleccion-carta-check.php" method="post">
+    <form action="modificar-set-carta-check.php" method="post">
         <div>
             <select name="carta">
                 <?php 
                     $consulta = pg_exec("select * from mostrar_cartas()") or die("Consulta fallida");
                     while ($contenido = pg_fetch_assoc($consulta)) {
-                        echo "<option value='".$contenido['id']."?".$contenido['idioma']."?".$contenido['estampado']."?".$contenido['coleccion']."'>
+                        echo "<option value='".$contenido['id']."?".$contenido['idioma']."?".$contenido['estampado']."?".$contenido['nombreset']."'>
                         ID: ".$contenido['id']." Nombre: ".$contenido['nombre']." 
-                        Colecci&oacute;n: ".$contenido['coleccion']." 
-                        Expansion: ".$contenido['expansion']." 
+                        Set: ".$contenido['nombreset']." 
+                        Categoria: ".$contenido['nombrecategoria']." 
+                        Ilustrador: ".$contenido['nombreilustrador']." 
+                        Serie: ".$contenido['nombreserie']."
                         Rareza: ".$contenido['rareza']." 
                         Marca de Regulaci&oacute;n: ".$contenido['marcaregulacion']." 
-                        Ilustrador: ".$contenido['ilustrador']." 
-                        Imagen: ".$contenido['imagen']." 
+                        Imagen: ".$contenido['imagen']."
                         Idioma: ".$contenido['idioma']." 
                         Estampado: ".$contenido['estampado']."</option>";
                     }
                 ?>
             </select>
-            Escoge la nueva colecci&oacute;n a la que pertenecer&aacute; esta carta: 
-            <select name="coleccionnueva">
+            Escoge el nuevo set al que pertenecer&aacute; esta carta: 
+            <select name="setnuevo">
                 <?php 
-                    $consulta = pg_exec("select nombre from mostrar_colecciones()") or die("Consulta fallida");
+                    $consulta = pg_exec("select nombre from mostrar_sets()") or die("Consulta fallida");
                     while ($contenido = pg_fetch_assoc($consulta)) {
                         echo "<option value='".$contenido['nombre']."'>".ucwords($contenido['nombre'])."</option>";
                     }

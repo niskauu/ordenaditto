@@ -16,13 +16,13 @@
         echo $_SESSION['name'];
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
-    <h2>Borrar colecciones</h2>
+    <h2>Borrar categorias</h2>
     <h2>PRECAUCI&Oacute;N La acci&oacute;n que esta a punto de realizar es irreversible</h2>
-    <form action="borrar-coleccion-check.php" method="post">
+    <form action="borrar-categoria-check.php" method="post">
         <div>
-            <select name="coleccion">
+            <select name="categoria">
                 <?php 
-                    $consulta = pg_exec("select nombre from mostrar_colecciones()") or die("Consulta fallida");
+                    $consulta = pg_exec("select nombre from mostrar_categorias()") or die("Consulta fallida");
                     while ($contenido = pg_fetch_assoc($consulta)) {
                         echo "<option value='".$contenido['nombre']."'>".ucwords($contenido['nombre'])."</option>";
                     }

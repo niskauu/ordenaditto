@@ -1,14 +1,14 @@
 <script>
 function espacios_vacios() {
     alert("Debe ingresar un nuevo nombre válido");
-    window.location.replace("ingresar-coleccion.php");
+    window.location.replace("ingresar-serie.php");
 }
 function ya_existe() {
-    alert("Esta colección ya existe");
-    window.location.replace("ingresar-coleccion.php");
+    alert("Esta serie ya existe");
+    window.location.replace("ingresar-serie.php");
 }
 function correcto() {
-    alert("Se ha ingresado la nueva colección");
+    alert("Se ha ingresado la nueva serie");
     window.location.replace("../dashboard.php");
 }
 </script>
@@ -17,9 +17,9 @@ function correcto() {
     include_once('../../php/conectar.php');
     if (! empty($_POST)) {
         if (isset($_POST['nombre']) && strlen(trim($_POST['nombre'])) > 0){
-            $existe_la_coleccion = pg_exec("select * from buscar_coleccion('".$_POST['nombre']."')") or die('Consulta fallida');
-            if (pg_fetch_result($existe_la_coleccion,'buscar_coleccion') == '0') {
-                $consulta = pg_exec("select insertar_coleccion('".strtolower($_POST['nombre'])."','".$_SESSION['user_id']."')") or die('Consulta fallida');
+            $existe_la_serie = pg_exec("select * from buscar_serie('".$_POST['nombre']."')") or die('Consulta fallida');
+            if (pg_fetch_result($existe_la_serie,'buscar_serie') == '0') {
+                $consulta = pg_exec("select insertar_serie('".strtolower($_POST['nombre'])."','".$_SESSION['user_id']."')") or die('Consulta fallida');
                 echo "<script>correcto();</script>";
             } else {
                 echo "<script>ya_existe();</script>";

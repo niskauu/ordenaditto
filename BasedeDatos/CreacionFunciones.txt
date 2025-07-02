@@ -2,6 +2,89 @@
 ----- INSERTS
 -----
 
+create or replace function insertar_ilustrador(
+		nombre varchar(255),
+		rrss varchar(255),
+		auditoriausuario varchar(30)
+) returns void as
+$$
+begin
+	insert into ilustrador (
+		nombre,
+		rrss,
+		cantidadcartas,
+		auditoriausuario,
+		auditoriafecha
+	) values (
+		$1,$2,0,$3,NOW()
+	);
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_categoria(
+		nombre varchar(255),
+		auditoriausuario varchar(30)
+) returns void as
+$$
+begin
+	insert into categoria (
+		nombre,
+		auditoriausuario,
+		auditoriafecha
+	) values (
+		$1,$2,NOW()
+	);
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_set(
+		nombre varchar(255),
+		nombreserie varchar(255),
+		auditoriausuario varchar(30)
+) returns void as
+$$
+begin
+	insert into set (
+		nombre,
+		nombreserie,
+		auditoriausuario,
+		auditoriafecha
+	) values (
+		$1,$2,$3,NOW()
+	);
+end;
+$$
+language plpgsql;
+
+create or replace function insertar_comentario(
+		texto text,
+		nombreusuario varchar(30),
+		correo varchar(255),
+		tipo varchar(1),
+		idcarta varchar(10),
+		idiomacarta varchar(255),
+		estampadocarta varchar(255)
+) returns void as
+$$
+begin
+	insert into comentario (
+		texto,
+		nombreusuario,
+		correo,
+		tipo,
+		idcarta,
+		idiomacarta,
+		estampadocarta,
+		fecha
+	) values (
+		$1,$2,$3,$4,$5,$6,$7,NOW()
+	);
+end;
+$$
+language plpgsql;
+
 create or replace function insertar_baraja(
 		nombre varchar(30),
 		usuario varchar(30),
@@ -119,13 +202,13 @@ end;
 $$
 language plpgsql;
 
-create or replace function insertar_coleccion(
+create or replace function insertar_serie(
 	nombre varchar(255),
 	usuario varchar(255)
 ) returns void as
 $$
 begin
-	insert into coleccion (
+	insert into serie (
 		nombre,
 		auditoriausuario,
 		auditoriafecha
@@ -140,11 +223,11 @@ language plpgsql;
 create or replace function insertar_carta(
 		id varchar(10),
 		nombre varchar(255),
-		coleccion varchar(255),
-		expansion varchar(255),
+		nombreset varchar(255),
+		nombrecategoria varchar(255),
+		nombreilustrador varchar(255),
 		rareza varchar(255),
 		marcaregulacion varchar(255),
-		ilustrador varchar(255),
 		imagen varchar(255),
 		idioma varchar(255),
 		estampado varchar(255),
@@ -155,11 +238,11 @@ begin
 	insert into carta (
 		id,
 		nombre,
-		nombrecoleccion,
-		expansion,
+		nombreset,
+		nombrecategoria,
+		nombreilustrador,
 		rareza,
 		marcaregulacion,
-		ilustrador,
 		imagen,
 		idioma,
 		estampado,
@@ -216,6 +299,47 @@ language plpgsql;
 ----
 ---- BORRAR
 ----
+
+create or replace function delete_ilustrador(
+		nombre varchar(30)
+) returns void as
+$$
+begin
+	delete from ilustrador as i where i.nombre=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_categoria(
+		nombre varchar(255)
+) returns void as
+$$
+begin
+	delete from categoria as c where c.nombre=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_set(
+		nombre varchar(255)
+) returns void as
+$$
+begin
+	delete from set as s where s.nombre=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function delete_comentario(
+		id int
+) returns void as
+$$
+begin
+	delete from comentario as c where c.id=$1;
+end;
+$$
+language plpgsql;
+
 create or replace function delete_usuario(
 		nombreusuario varchar(30),
 		correo varchar(255),
@@ -244,8 +368,12 @@ create or replace function delete_carta(
 		estampado carta.estampado%type
 ) returns void as
 $$
+declare
+	aux varchar(255);
 begin
+	select i.nombre into aux from ilustrador as i, carta as c where i.nombre = c.nombreilustrador and c.id=$1 and c.idioma=$2 and c.estampado=$3; 
 	delete from carta as c where c.id=$1 and c.idioma=$2 and c.estampado=$3;
+	update ilustrador as i set cantidadcartas=(select count(*) as cantidad from carta as c where c.nombreilustrador=aux) where i.nombre=aux;
 end;
 $$
 language plpgsql;
@@ -264,12 +392,12 @@ end;
 $$
 language plpgsql;
 
-create or replace function delete_coleccion(
-		nombre coleccion.nombre%type
+create or replace function delete_serie(
+		nombre serie.nombre%type
 ) returns void as
 $$
 begin
-	delete from coleccion as c where c.nombre=$1;
+	delete from serie as c where c.nombre=$1;
 end;
 $$
 language plpgsql;
@@ -314,12 +442,12 @@ end;
 $$
 language plpgsql;
 
-create or replace function delete_coleccion(
-		nombre coleccion.nombre%type
+create or replace function delete_serie(
+		nombre serie.nombre%type
 ) returns void as
 $$
 begin
-	delete from coleccion as c where c.nombre=$1;
+	delete from serie as c where c.nombre=$1;
 end;
 $$
 language plpgsql;
@@ -327,6 +455,54 @@ language plpgsql;
 ---
 --- Mostrar
 ---
+
+create or replace function mostrar_ilustradores(
+	out nombre ilustrador.nombre%type,
+	out rrss ilustrador.rrss%type,
+	out cantidadcartas ilustrador.cantidadcartas%type
+) returns setof record as
+$$
+begin
+	return query select i.nombre, i.rrss, i.cantidadcartas from ilustrador i;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_categorias(
+	out nombre categoria.nombre%type
+) returns setof varchar as
+$$
+begin
+	return query select c.nombre from categoria c;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_sets(
+	out nombre set.nombre%type,
+	out nombreserie set.nombreserie%type
+) returns setof record as
+$$
+begin
+	return query select s.nombre, s.nombreserie from set s;
+end;
+$$
+language plpgsql;
+
+create or replace function mostrar_comentarios(
+	in idcarta carta.id%type,
+	out idcomentario comentario.id%type,
+	out texto comentario.texto%type,
+	out nombreusuario comentario.nombreusuario%type,
+	out fecha comentario.fecha%type
+) returns setof record as
+$$
+begin
+	return query select c.id, c.texto, c.nombreusuario, c.fecha from comentario as c where c.idcarta=$1;
+end;
+$$
+language plpgsql;
+
 create or replace function mostrar_usuarios(
 	out nombreusuario usuario.nombreusuario%type,
 	out nombrevisual usuario.nombrevisual%type,
@@ -344,11 +520,12 @@ language plpgsql;
 create or replace function mostrar_cartas(
 	out id carta.id%type,
 	out nombre carta.nombre%type,
-	out coleccion carta.nombrecoleccion%type,
-	out expansion carta.expansion%type,
+	out nombreset carta.nombreset%type,
+	out nombrecategoria carta.nombrecategoria%type,
+	out nombreilustrador carta.nombreilustrador%type,
+	out nombreserie serie.nombre%type,
 	out rareza carta.rareza%type,
 	out marcaregulacion carta.marcaregulacion%type,
-	out ilustrador carta.ilustrador%type,
 	out imagen carta.imagen%type,
 	out idioma carta.idioma%type,
 	out estampado carta.estampado%type
@@ -357,15 +534,16 @@ $$
 begin
 	return query select c.id, 
 						c.nombre, 
-						c.nombrecoleccion, 
-						c.expansion, 
+						c.nombreset, 
+						c.nombrecategoria, 
+						c.nombreilustrador,
+						ser.nombre,
 						c.rareza, 
 						c.marcaregulacion, 
-						c.ilustrador, 
 						c.imagen, 
 						c.idioma, 
 						c.estampado
-						from carta as c;
+						from carta as c, set as s, serie as ser where c.nombreset=s.nombre and s.nombreserie=ser.nombre;
 end;
 $$
 language plpgsql;
@@ -398,24 +576,33 @@ language plpgsql;
 
 create or replace function mostrar_contenido_lista(
 	IN idbuscar lista.id%type,
-	OUT id carta.id%type,
-	OUT nombre carta.nombre%type,
-	OUT coleccion carta.nombrecoleccion%type,
-	OUT expansion carta.expansion%type,
-	OUT rareza carta.rareza%type,
-	OUT marcaregulacion carta.marcaregulacion%type,
-	OUT ilustrador carta.ilustrador%type,
-	OUT imagen carta.imagen%type,
-	OUT idioma carta.idioma%type,
-	OUT estampado carta.estampado%type
+	out id carta.id%type,
+	out nombre carta.nombre%type,
+	out nombreset carta.nombreset%type,
+	out nombrecategoria carta.nombrecategoria%type,
+	out nombreilustrador carta.nombreilustrador%type,
+	out nombreserie serie.nombre%type,
+	out rareza carta.rareza%type,
+	out marcaregulacion carta.marcaregulacion%type,
+	out imagen carta.imagen%type,
+	out idioma carta.idioma%type,
+	out estampado carta.estampado%type
 ) returns setof record as
 $$
 begin
-	return query select c.id,c.nombre, c.nombrecoleccion,
-						c.expansion, c.rareza, c.marcaregulacion,
-						c.ilustrador, c.imagen, c.idioma, c.estampado
-						from carta c, incluyelista i
-	where i.idlista=$1 and i.idcarta=c.id and i.idiomacarta=c.idioma and i.estampadocarta=c.estampado;
+	return query select c.id, 
+						c.nombre, 
+						c.nombreset, 
+						c.nombrecategoria, 
+						c.nombreilustrador,
+						ser.nombre,
+						c.rareza, 
+						c.marcaregulacion, 
+						c.imagen, 
+						c.idioma, 
+						c.estampado
+						from carta c, incluyelista i, set as s, serie as ser
+						where i.idlista=$1 and i.idcarta=c.id and i.idiomacarta=c.idioma and i.estampadocarta=c.estampado and c.nombreset=s.nombre and s.nombreserie=ser.nombre;
 end;
 $$
 language plpgsql;
@@ -431,39 +618,49 @@ end;
 $$
 language plpgsql;
 
-create or replace function mostrar_colecciones(
-	out nombre coleccion.nombre%type,
-	out auditoriausuario coleccion.auditoriausuario%type,
-	out auditoriafecha coleccion.auditoriafecha%type
+create or replace function mostrar_series(
+	out nombre serie.nombre%type,
+	out auditoriausuario serie.auditoriausuario%type,
+	out auditoriafecha serie.auditoriafecha%type
 ) returns setof record as
 $$
 begin
-	return query select c.nombre, c.auditoriausuario, c.auditoriafecha from coleccion as c;
+	return query select c.nombre, c.auditoriausuario, c.auditoriafecha from serie as c;
 end;
 $$
 language plpgsql;
 
 create or replace function mostrar_contenido_baraja(
 	IN idbuscar baraja.id%type,
-	OUT id carta.id%type,
-	OUT nombre carta.nombre%type,
-	OUT coleccion carta.nombrecoleccion%type,
-	OUT expansion carta.expansion%type,
-	OUT rareza carta.rareza%type,
-	OUT marcaregulacion carta.marcaregulacion%type,
-	OUT ilustrador carta.ilustrador%type,
-	OUT imagen carta.imagen%type,
-	OUT idioma carta.idioma%type,
-	OUT estampado carta.estampado%type,
+	out id carta.id%type,
+	out nombre carta.nombre%type,
+	out nombreset carta.nombreset%type,
+	out nombrecategoria carta.nombrecategoria%type,
+	out nombreilustrador carta.nombreilustrador%type,
+	out nombreserie serie.nombre%type,
+	out rareza carta.rareza%type,
+	out marcaregulacion carta.marcaregulacion%type,
+	out imagen carta.imagen%type,
+	out idioma carta.idioma%type,
+	out estampado carta.estampado%type,
 	OUT cantidadcopias incluyebaraja.cantidadcopias%type
 ) returns setof record as
 $$
 begin
-	return query select c.id,c.nombre, c.nombrecoleccion,
-						c.expansion, c.rareza, c.marcaregulacion,
-						c.ilustrador, c.imagen, c.idioma, c.estampado, i.cantidadcopias
-						from carta c, incluyebaraja i
-	where i.idbaraja=$1 and i.idcarta=c.id and i.idiomacarta=c.idioma and i.estampadocarta=c.estampado;
+	return query select c.id, 
+						c.nombre, 
+						c.nombreset, 
+						c.nombrecategoria, 
+						c.nombreilustrador,
+						ser.nombre,
+						c.rareza, 
+						c.marcaregulacion, 
+						c.imagen, 
+						c.idioma, 
+						c.estampado,
+						i.cantidadcopias
+						from carta c, incluyebaraja i, set as s, serie as ser
+						where i.idbaraja=$1 and i.idcarta=c.id and i.idiomacarta=c.idioma and i.estampadocarta=c.estampado and c.nombreset=s.nombre and s.nombreserie=ser.nombre;
 end;
 $$
 language plpgsql;
@@ -532,11 +729,8 @@ begin
 		when 'nombre' then
 			update carta as c set nombre=cast($1 as varchar(255))
 			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
-		when 'coleccion' then
-			update carta as c set nombrecoleccion=cast($1 as varchar(255))
-			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
-		when 'expansion' then
-			update carta as c set expansion=cast($1 as varchar(255))
+		when 'set' then
+			update carta as c set nombreset=cast($1 as varchar(255))
 			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'rareza' then
 			update carta as c set rareza=cast($1 as varchar(255))
@@ -545,7 +739,7 @@ begin
 			update carta as c set marcaregulacion=cast($1 as varchar(255))
 			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'ilustrador' then
-			update carta as c set ilustrador=cast($1 as varchar(255))
+			update carta as c set nombreilustrador=cast($1 as varchar(255))
 			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'imagen' then
 			update carta as c set imagen=cast($1 as varchar(255))
@@ -555,6 +749,9 @@ begin
 			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		when 'estampado' then
 			update carta as c set estampado=cast($1 as varchar(255))
+			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
+		when 'categoria' then
+			update carta as c set nombrecategoria=cast($1 as varchar(255))
 			where c.id=$3 and c.idioma=$4 and c.estampado=$5;
 		else
 			raise notice 'Debe especificar un atributo';
@@ -587,14 +784,92 @@ end;
 $$
 language plpgsql;
 
-create or replace function cambiar_nombre_coleccion(
-  nombre_coleccion_cambiar coleccion.nombre%type, 
-  nuevo_nombre coleccion.nombre%type
+create or replace function cambiar_nombre_serie(
+  nombre_serie_cambiar serie.nombre%type, 
+  nuevo_nombre serie.nombre%type
 ) returns void as
 $$
 begin
-	update coleccion as c set nombre=$2
+	update serie as s set nombre=$2
   where nombre=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function cambiar_nombre_set(
+  nombre_set_cambiar set.nombre%type, 
+  nuevo_nombre set.nombre%type
+) returns void as
+$$
+begin
+	update set as s set nombre=$2
+  where nombre=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function cambiar_nombre_categoria(
+  nombre_categoria_cambiar categoria.nombre%type, 
+  nuevo_nombre categoria.nombre%type
+) returns void as
+$$
+begin
+	update categoria as c set nombre=$2
+  where nombre=$1;
+end;
+$$
+language plpgsql;
+
+create or replace function modificar_atributos_ilustrador(
+	nuevodato text,
+	atributo text,
+	id ilustrador.nombre%type
+) returns void as
+$$
+begin
+	case atributo
+		when 'nombre' then
+			update ilustrador as i set nombre=cast($1 as varchar(30))
+			where i.nombre=$3;
+		when 'rrss' then
+			update ilustrador as i set rrss=cast($1 as varchar(255))
+			where i.nombre=$3;
+		else
+			raise notice 'Debe especificar un atributo';
+	end case;
+end;
+$$
+language plpgsql;
+
+create or replace function modificar_atributos_set(
+	nuevodato text,
+	atributo text,
+	id set.nombre%type
+) returns void as
+$$
+begin
+	case atributo
+		when 'nombre' then
+			update set as s set nombre=cast($1 as varchar(255))
+			where s.nombre=$3;
+		when 'nombreserie' then
+			update set as s set nombreserie=cast($1 as varchar(255))
+			where s.nombre=$3;
+		else
+			raise notice 'Debe especificar un atributo';
+	end case;
+end;
+$$
+language plpgsql;
+
+create or replace function editar_comentario(
+  idcomentario comentario.id%type, 
+  nuevotexto comentario.texto%type
+) returns void as
+$$
+begin
+	update comentario as c set texto=$2
+  where id=$1;
 end;
 $$
 language plpgsql;
@@ -624,14 +899,68 @@ end;
 $$
 language plpgsql;
 
-create or replace function buscar_coleccion(
-	nombre coleccion.nombre%type
+create or replace function buscar_serie(
+	nombre serie.nombre%type
 ) returns int as 
 $$
 declare
 	existe int;
 begin
-	select count(*) as cantidad from coleccion as c where 
+	select count(*) as cantidad from serie as c where 
+	c.nombre=$1 into existe;
+  if existe > 0 then
+  	return 1;
+  else
+  	return 0;
+  end if;
+end;
+$$
+language plpgsql;
+
+create or replace function buscar_set(
+	nombre set.nombre%type
+) returns int as 
+$$
+declare
+	existe int;
+begin
+	select count(*) as cantidad from set as c where 
+	c.nombre=$1 into existe;
+  if existe > 0 then
+  	return 1;
+  else
+  	return 0;
+  end if;
+end;
+$$
+language plpgsql;
+
+create or replace function buscar_ilustrador(
+	nombre ilustrador.nombre%type
+) returns int as 
+$$
+declare
+	existe int;
+begin
+	select count(*) as cantidad from ilustrador as c where 
+	c.nombre=$1 into existe;
+  if existe > 0 then
+  	return 1;
+  else
+  	return 0;
+  end if;
+end;
+$$
+language plpgsql;
+
+create or replace function buscar_categoria(
+	nombre categoria.nombre%type
+) returns int as 
+$$
+declare
+	existe int;
+begin
+	select count(*) as cantidad from categoria as c where 
 	c.nombre=$1 into existe;
   if existe > 0 then
   	return 1;
@@ -697,3 +1026,24 @@ begin
 end;
 $$
 language plpgsql;
+
+create or replace function actualizar_cantidad_cartas_ilustradores()
+returns trigger as
+$$
+declare
+	t_curs cursor for select * from ilustrador;
+  t_row ilustrador%rowtype;
+begin
+
+for t_row in t_curs
+	loop
+  	update ilustrador as i set cantidadcartas=(select count(*) as cantidad from carta as c where c.nombreilustrador=t_row.nombre) where i.nombre=t_row.nombre;
+ 	end loop;
+return null;
+end;
+$$
+language plpgsql;
+
+create or replace trigger cantidad_cartas_ilustrador_trigger
+after update or delete or insert on carta
+execute function actualizar_cantidad_cartas_ilustradores();

@@ -1,10 +1,10 @@
 <script>
 function correcto() {
-    alert("La colección ha sido eliminada correctamente");
+    alert("El set ha sido eliminado correctamente");
     window.location.replace("../dashboard.php");
 }
-function no_hay_colecciones() {
-    alert("Primero debe crear una colección para borrar");
+function no_hay_set() {
+    alert("Primero debe crear un set para borrar");
     window.location.replace("../dashboard.php");
 }
 </script>
@@ -12,10 +12,10 @@ function no_hay_colecciones() {
     session_start();
     include_once('../../php/conectar.php');
     if (! empty($_POST)) {
-        pg_exec("select delete_coleccion('".$_POST['coleccion']."')") or die('Consulta fallida');
+        pg_exec("select delete_set('".$_POST['set']."')") or die('Consulta fallida');
         echo "<script>correcto();</script>";
     } else {
-        echo "<script>no_hay_colecciones();</script>";
+        echo "<script>no_hay_set();</script>";
     }
 
 ?>

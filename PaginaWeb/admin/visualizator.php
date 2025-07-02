@@ -1,3 +1,15 @@
+<script>
+    window.addEventListener( "pageshow", function ( event ) {
+  var historyTraversal = event.persisted || 
+                         ( typeof window.performance != "undefined" && 
+                              window.performance.navigation.type === 2 );
+  if ( historyTraversal ) {
+    // Handle page restore.
+    window.location.reload();
+  }
+});
+</script>
+
 <?php include_once('../php/conectar.php') ?>
 <!DOCTYPE html>
 <html>
@@ -5,9 +17,14 @@
         <title>Ordenaditto</title>
     </head>
     <h1>Ordenaditto</h1>
-    <a href="../login.php">Iniciar sesi&oacute;n</a>
-    <a href="../register.php">Registrarse</a>
+    <a href="dashboard.php">Inicio</a>
     <a href="explore.php">Explorar</a>
+    <a href="logout.php">Cerrar sesi&oacute;n</a>
+    Bienvenido ADMINISTRADOR
+    <?php 
+        echo $_SESSION['name'];
+        echo " <img src='".$_SESSION['avatar']."' width='30'>";
+    ?>
         <div>
         <?php 
             $consulta = pg_exec("select id, nombre, rareza, imagen from mostrar_cartas() where id='".$_GET['id']."';") or die("Consulta fallida");
@@ -36,10 +53,14 @@
                     $avatar = pg_fetch_assoc($consulta_avatar);
                     echo "<img src='".$avatar['avatar']."' width='10'> <p>".$contenido['nombreusuario']." ".date('d-m-Y H:i', strtotime($contenido['fecha']))."</p>";
                     echo "<p>".$contenido['texto']."</p>";
+                    echo "<form action='utilidades/borrar-comentario-check.php' method='post'>
+                            <input type='hidden' name='idcomentario' value='".$contenido['idcomentario']."'/>
+                            <input type='submit' value='Borrar' id='hyperlink-style-button'/>
+                        </form>";
                     }
                 }
                 
             ?>
         </div>
-        <a href="../guest/explore.php">Volver</a>
+        <a href="javascript:history.back();">Volver</a>
 </html>
