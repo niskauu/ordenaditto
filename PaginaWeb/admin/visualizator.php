@@ -1,4 +1,5 @@
 <script>
+  // recargara la pagina en caso de eliminar comentarios  
     window.addEventListener( "pageshow", function ( event ) {
   var historyTraversal = event.persisted || 
                          ( typeof window.performance != "undefined" && 

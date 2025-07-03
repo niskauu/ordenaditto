@@ -1,7 +1,8 @@
 <script>
 function correcto() {
     alert("La serie ha sido eliminada correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_series() {
     alert("Primero debe crear una serie para borrar");

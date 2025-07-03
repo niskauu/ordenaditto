@@ -14,14 +14,10 @@
     Bienvenido 
     <?php 
         echo $_SESSION['name'];
-        echo " <img src='".$_SESSION['avatar']."' width='30'>";
+        echo "<a href='perfil/perfil.php'><img src='".$_SESSION['avatar']."' width='30'></a>";
     ?>
-    <form action='add-lista.php' method='post'>
-        <input type='submit' value='Agregar nueva lista' id='hyperlink-style-button'/>
-    </form>
-    <form action='baraja/add-baraja.php' method='post'>
-        <input type='submit' value='Agregar nueva baraja' id='hyperlink-style-button'/>
-    </form>
+    
+    
     <h3>Listas de colecci&oacute;n</h3>
     <?php
         $consulta = pg_exec("select id, nombre, cantidadcartas from mostrar_listas() where usuariolista='".$_SESSION['user_id']."'") or die('Consulta fallida');
@@ -50,14 +46,17 @@
                 <input type='submit' value='Borrar' id='hyperlink-style-button'/>
             </form>
             </td>";
-            echo "</tr>
-                </table>";
+            echo "</tr>";
             }
+            echo "</table>";
         } else {
             echo "No tienes listas, crea una nueva";
         }
         
     ?>
+    <form action='add-lista.php' method='post'>
+        <input type='submit' value='Agregar nueva lista' id='hyperlink-style-button'/>
+    </form>
 
     <h3>Barajas</h3>
 
@@ -88,13 +87,16 @@
                 <input type='submit' value='Borrar' id='hyperlink-style-button'/>
             </form>
             </td>";
-            echo "</tr>
-                </table>";
+            echo "</tr>";
             }
+            echo "</table>";
         } else {
             echo "No tienes barajas, crea una nueva";
         }
         
     ?>
+    <form action='baraja/add-baraja.php' method='post'>
+        <input type='submit' value='Agregar nueva baraja' id='hyperlink-style-button'/>
+    </form>
     
 </html>

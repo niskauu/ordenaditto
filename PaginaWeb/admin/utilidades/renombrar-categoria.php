@@ -16,7 +16,7 @@
         echo $_SESSION['name'];
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
-    <h2>Renombrar categorias</h2>
+    <h2>Renombrar categor&iacute;as</h2>
     <form action="renombrar-categoria-check.php" method="post">
         <div>
             <select name="categoria">

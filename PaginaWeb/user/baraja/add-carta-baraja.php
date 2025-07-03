@@ -16,7 +16,7 @@
     Bienvenido 
     <?php 
         echo $_SESSION['name'];
-        echo " <img src='".$_SESSION['avatar']."' width='30'>";
+        echo "<a href='perfil/perfil.php'><img src='".$_SESSION['avatar']."' width='30'></a>";
     ?>
         <div>
         <?php 

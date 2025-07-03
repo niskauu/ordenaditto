@@ -26,7 +26,7 @@
                         echo "<option value='".$contenido['id']."?".$contenido['idioma']."?".$contenido['estampado']."?".$contenido['nombreilustrador']."'>
                         ID: ".$contenido['id']." Nombre: ".$contenido['nombre']." 
                         Set: ".$contenido['nombreset']." 
-                        Categoria: ".$contenido['nombrecategoria']." 
+                        Categor&iacute;a: ".$contenido['nombrecategoria']." 
                         Ilustrador: ".$contenido['nombreilustrador']." 
                         Serie: ".$contenido['nombreserie']."
                         Rareza: ".$contenido['rareza']." 

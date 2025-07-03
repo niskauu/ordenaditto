@@ -1,7 +1,8 @@
 <script>
 function correcto() {
     alert("El ilustrador ha sido eliminado correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_ilustrador() {
     alert("Primero debe crear un ilustrador para borrar");

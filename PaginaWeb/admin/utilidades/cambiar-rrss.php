@@ -16,7 +16,7 @@
         echo $_SESSION['name'];
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
-    <h2>Cambiar redes sociales ilustrador</h2>
+    <h2>Cambiar redes sociales de ilustrador</h2>
     <form action="cambiar-rrss-check.php" method="post">
         <div>
             <select name="ilustrador">

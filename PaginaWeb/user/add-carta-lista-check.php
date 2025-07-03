@@ -1,15 +1,18 @@
 <script>
 function agregado() {
     alert("Se ha agregado la carta");
-    window.location.replace("dashboard.php");
+    window.location.replace("explore.php");
 }
 function no_hay_listas() {
     alert("Primero debe crear una lista para agregar cartas");
-    window.location.replace("dashboard.php");
+    // window.location.replace("dashboard.php");
+    // history.back();
+    history.go(-2);
 }
 function ya_existe() {
     alert("Ya existe esta carta en la lista seleccionada");
-    window.location.replace("dashboard.php");
+    // window.location.replace("dashboard.php");
+    history.go(-2);
 }
 </script>
 <?php

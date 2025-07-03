@@ -19,13 +19,14 @@ function no_existe() {
         if (isset( $_POST['username'] ) && isset( $_POST['pass'] ) && strlen(trim($_POST['username'])) > 0 && strlen(trim($_POST['pass'])) > 0) {
             switch ($_POST['cuenta']) {
                 case 'U':
-                    $check = pg_exec("select mu.nombreusuario, mu.nombrevisual, mu.avatar, u.clave, mu.tipo from mostrar_usuarios() as mu, usuario as u 
+                    $check = pg_exec("select mu.nombreusuario, mu.correo, mu.nombrevisual, mu.avatar, u.clave, mu.tipo from mostrar_usuarios() as mu, usuario as u 
                     where mu.nombreusuario='".$_POST['username']."' and u.nombreusuario='".$_POST['username']."' and mu.tipo='".$_POST['cuenta']."' and u.tipo='".$_POST['cuenta']."'");
                     if (pg_num_rows($check)>0) {
                         if (pg_fetch_result($check,'clave') == md5($_POST['pass'])) {
                             $_SESSION['user_id'] = $_POST['username'];
                             $_SESSION['name'] = pg_fetch_result($check,0,'nombrevisual');
                             $_SESSION['avatar'] = pg_fetch_result($check,0,'avatar');
+                            $_SESSION['correo'] = pg_fetch_result($check,0,'correo');
                             $_SESSION['tipocuenta'] = 'U';
                             header("Location: user/dashboard.php");
                         } else {
@@ -36,13 +37,14 @@ function no_existe() {
                     }
                     break;
                 case 'A':
-                    $check = pg_exec("select mu.nombreusuario, mu.nombrevisual, mu.avatar, u.clave, mu.tipo from mostrar_usuarios() as mu, usuario as u 
+                    $check = pg_exec("select mu.nombreusuario, mu.correo, mu.nombrevisual, mu.avatar, u.clave, mu.tipo from mostrar_usuarios() as mu, usuario as u 
                     where mu.nombreusuario='".$_POST['username']."' and u.nombreusuario='".$_POST['username']."' and mu.tipo='".$_POST['cuenta']."' and u.tipo='".$_POST['cuenta']."'");
                     if (pg_num_rows($check)>0) {
                         if (pg_fetch_result($check,'clave') == md5($_POST['pass'])) {
                             $_SESSION['user_id'] = $_POST['username'];
                             $_SESSION['name'] = pg_fetch_result($check,0,'nombrevisual');
                             $_SESSION['avatar'] = pg_fetch_result($check,0,'avatar');
+                            $_SESSION['correo'] = pg_fetch_result($check,0,'correo');
                             $_SESSION['tipocuenta'] = 'A';
                             header("Location: admin/dashboard.php");
                         } else {

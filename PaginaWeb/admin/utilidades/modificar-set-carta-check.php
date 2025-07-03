@@ -1,15 +1,18 @@
 <script>
 function espacios_vacios() {
     alert("Debe ingresar un nuevo dato para modificar");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function correcto() {
     alert("La carta ha sido modificada exitosamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function ya_pertenece() {
     alert("La carta ya pertenece al set seleccionado");
-    window.location.replace("modificar-set-carta.php");
+    // window.location.replace("modificar-set-carta.php");
+    history.back();
 }
 function no_existe_carta() {
     alert("Primero debe crear y seleccionar una carta para modificar");

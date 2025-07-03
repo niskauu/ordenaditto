@@ -1,11 +1,13 @@
 <script>
 function espacios_vacios() {
     alert("Debe ingresar un nuevo dato para modificar");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function correcto() {
     alert("La carta ha sido modificada exitosamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_carta() {
     alert("Primero debe crear y seleccionar una carta para modificar");

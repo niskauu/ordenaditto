@@ -1,23 +1,28 @@
 <script>
 function espacios_vacios() {
     alert("Debe ingresar todos los datos solicitados");
-    window.location.replace("registrar-usuario.php");
+    // window.location.replace("registrar-usuario.php");
+    history.back();
 }
 function no_coinciden() {
     alert("Las contraseñas ingresadas no coinciden");
-    window.location.replace("registrar-usuario.php");
+    // window.location.replace("registrar-usuario.php");
+    history.back();
 }
 function correcto() {
     alert("Usuario registrado correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function email_invalido() {
     alert("Debe ingresar un correo electrónico valido");
-    window.location.replace("registrar-usuario.php");
+    // window.location.replace("registrar-usuario.php");
+    history.back();
 }
 function usuario_existe() {
     alert("Ya existe un usuario con este correo y usuario registrados");
-    window.location.replace("registrar-usuario.php");
+    // window.location.replace("registrar-usuario.php");
+    history.back();
 }
 </script>
 <?php

@@ -1,7 +1,8 @@
 <script>
 function correcto() {
     alert("El set ha sido modificado correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_series() {
     alert("Primero debe crear y seleccionar una serie para modificar");

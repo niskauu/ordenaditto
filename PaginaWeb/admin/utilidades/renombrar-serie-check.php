@@ -1,11 +1,13 @@
 <script>
 function correcto() {
     alert("La serie ha sido renombrada correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function espacios_vacios() {
     alert("Debe ingresar un nuevo nombre válido");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_serie() {
     alert("Primero debe crear y seleccionar una serie para renombrar");

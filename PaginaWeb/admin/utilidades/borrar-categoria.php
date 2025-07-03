@@ -16,7 +16,7 @@
         echo $_SESSION['name'];
         echo " <img src='".$_SESSION['avatar']."' width='30'>";
     ?>
-    <h2>Borrar categorias</h2>
+    <h2>Borrar categor&iacute;as</h2>
     <h2>PRECAUCI&Oacute;N La acci&oacute;n que esta a punto de realizar es irreversible</h2>
     <form action="borrar-categoria-check.php" method="post">
         <div>

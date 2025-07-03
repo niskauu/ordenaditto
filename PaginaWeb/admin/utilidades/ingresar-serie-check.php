@@ -1,15 +1,18 @@
 <script>
 function espacios_vacios() {
     alert("Debe ingresar un nuevo nombre válido");
-    window.location.replace("ingresar-serie.php");
+    // window.location.replace("ingresar-serie.php");
+    history.back();
 }
 function ya_existe() {
     alert("Esta serie ya existe");
-    window.location.replace("ingresar-serie.php");
+    // window.location.replace("ingresar-serie.php");
+    history.back();
 }
 function correcto() {
     alert("Se ha ingresado la nueva serie");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 </script>
 <?php

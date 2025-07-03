@@ -26,7 +26,7 @@
                         echo "<option value='".$contenido['id']."?".$contenido['idioma']."?".$contenido['estampado']."?".$contenido['nombrecategoria']."'>
                         ID: ".$contenido['id']." Nombre: ".$contenido['nombre']." 
                         Set: ".$contenido['nombreset']." 
-                        Categoria: ".$contenido['nombrecategoria']." 
+                        Categor&iacute;a: ".$contenido['nombrecategoria']." 
                         Ilustrador: ".$contenido['nombreilustrador']." 
                         Serie: ".$contenido['nombreserie']."
                         Rareza: ".$contenido['rareza']." 
@@ -37,7 +37,7 @@
                     }
                 ?>
             </select>
-            Escoge la nueva categoria a la que pertenecer&aacute; esta carta: 
+            Escoge la nueva categor&iacute;a a la que pertenecer&aacute; esta carta: 
             <select name="categoria">
                 <?php 
                     $consulta = pg_exec("select nombre from mostrar_categorias()") or die("Consulta fallida");

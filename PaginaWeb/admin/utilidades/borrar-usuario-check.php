@@ -1,7 +1,8 @@
 <script>
 function correcto() {
     alert("El usuario ha sido eliminado correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 </script>
 <?php

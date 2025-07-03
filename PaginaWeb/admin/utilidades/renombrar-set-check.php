@@ -1,11 +1,13 @@
 <script>
 function correcto() {
     alert("El set ha sido renombrado correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function espacios_vacios() {
     alert("Debe ingresar un nuevo nombre válido");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_set() {
     alert("Primero debe crear y seleccionar un set para renombrar");

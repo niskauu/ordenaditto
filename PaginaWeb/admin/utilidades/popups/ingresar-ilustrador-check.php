@@ -1,23 +1,21 @@
 <script>
 function espacios_vacios() {
     alert("Debe ingresar datos válidos");
-    // window.location.replace("ingresar-ilustrador.php");
-    history.back();
+    window.location.replace("ingresar-ilustrador.php");
 }
 function ya_existe() {
     alert("Este ilustrador ya existe");
-    // window.location.replace("ingresar-ilustrador.php");
-    history.back();
+    window.location.replace("ingresar-ilustrador.php");
 }
 function correcto() {
     alert("Se ha ingresado el nuevo ilustrador");
     // window.location.replace("../dashboard.php");
-    history.back();
+    window.close();
 }
 </script>
 <?php
     session_start();
-    include_once('../../php/conectar.php');
+    include_once('../../../php/conectar.php');
     if (! empty($_POST)) {
         if (isset($_POST['nombre']) && strlen(trim($_POST['nombre'])) > 0 &&
             isset($_POST['rrss']) && strlen(trim($_POST['rrss'])) > 0){

@@ -1,10 +1,11 @@
 <script>
 function correcto() {
-    alert("La categoria ha sido eliminada correctamente");
-    window.location.replace("../dashboard.php");
+    alert("La categoría ha sido eliminada correctamente");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_categoria() {
-    alert("Primero debe crear una categoria para borrar");
+    alert("Primero debe crear una categoría para borrar");
     window.location.replace("../dashboard.php");
 }
 </script>

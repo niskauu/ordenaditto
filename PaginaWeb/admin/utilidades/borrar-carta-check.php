@@ -1,7 +1,8 @@
 <script>
 function correcto() {
     alert("La carta ha sido eliminada correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_cartas() {
     alert("Primero debe crear y seleccionar una carta para borrar");

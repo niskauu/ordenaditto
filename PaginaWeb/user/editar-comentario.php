@@ -20,7 +20,7 @@ function volver() {
     Bienvenido 
     <?php 
         echo $_SESSION['name'];
-        echo " <img src='".$_SESSION['avatar']."' width='30'>";
+        echo "<a href='perfil/perfil.php'><img src='".$_SESSION['avatar']."' width='30'></a>";
     ?>
     <h2>Editando comentario</h2>
     <form action="editar-comentario-check.php" method="post">

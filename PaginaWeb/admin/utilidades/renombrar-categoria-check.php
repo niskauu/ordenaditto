@@ -1,14 +1,16 @@
 <script>
 function correcto() {
-    alert("La categoria ha sido renombrada correctamente");
-    window.location.replace("../dashboard.php");
+    alert("La categoría ha sido renombrada correctamente");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function espacios_vacios() {
     alert("Debe ingresar un nuevo nombre válido");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_categoria() {
-    alert("Primero debe crear y seleccionar una categoria para renombrar");
+    alert("Primero debe crear y seleccionar una categoría para renombrar");
     window.location.replace("../dashboard.php");
 }
 </script>

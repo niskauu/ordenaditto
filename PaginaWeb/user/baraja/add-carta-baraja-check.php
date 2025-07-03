@@ -5,15 +5,16 @@ function agregado() {
 }
 function no_agregado() {
     alert("No se ha podido agregar la carta, se ha alcanzado el limite para esta copia en la baraja");
-    window.location.replace("../dashboard.php");
+    window.location.replace("../explore.php");
 }
 function no_hay_barajas() {
     alert("Primero debe crear una baraja para agregar cartas");
-    window.location.replace("dashboard.php");
+    window.location.replace("../dashboard.php");
+    // history.go(-2);
 }
 function ya_existe() {
     alert("Ya existe esta carta en la lista seleccionada");
-    window.location.replace("dashboard.php");
+    window.location.replace("../explore.php");
 }
 </script>
 <?php

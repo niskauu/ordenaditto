@@ -1,7 +1,8 @@
 <script>
 function correcto() {
     alert("El set ha sido eliminado correctamente");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 function no_hay_set() {
     alert("Primero debe crear un set para borrar");

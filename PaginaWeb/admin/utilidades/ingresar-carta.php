@@ -1,3 +1,35 @@
+<script>
+    function openPopupSet(){
+        var popupSet = window.open("popups/ingresar-set.php","Agregar set","width=800,height=600,resizable=no,scrollbars=no");
+        var intervalo = setInterval(function() {
+                if (popupSet.closed) {
+                    clearInterval(intervalo);
+                    // Recarga la página principal cuando se cierra la ventana emergente
+                    window.location.reload();
+                }
+            }, 500);
+    };
+    function openPopupCategoria(){
+        var popupCategoria = window.open("popups/ingresar-categoria.php","Agregar categoría","width=800,height=600,resizable=no,scrollbars=no");
+        var intervalo = setInterval(function() {
+                if (popupCategoria.closed) {
+                    clearInterval(intervalo);
+                    // Recarga la página principal cuando se cierra la ventana emergente
+                    window.location.reload();
+                }
+            }, 500);
+    };
+    function openPopupIlustrador(){
+        var popupIlustrador = window.open("popups/ingresar-ilustrador.php","Agregar ilustrador","width=800,height=600,resizable=no,scrollbars=no");
+        var intervalo = setInterval(function() {
+                if (popupIlustrador.closed) {
+                    clearInterval(intervalo);
+                    // Recarga la página principal cuando se cierra la ventana emergente
+                    window.location.reload();
+                }
+            }, 500);
+    };
+</script>
 <?php
     session_start();
     include_once('../../php/conectar.php');
@@ -32,7 +64,8 @@
                     }
             ?>
             </select>
-            Categoria: 
+            <a href="javascript:openPopupSet();"><img src="popups/add.png" width="20"></a>
+            Categor&iacute;a: 
             <select name=categoria>
             <?php
                 $consulta = pg_exec("select nombre from mostrar_categorias();") or die('Consulta fallida');
@@ -41,6 +74,7 @@
                     }
             ?>
             </select>
+            <a href="javascript:openPopupCategoria();"><img src="popups/add.png" width="20"></a>
             Rareza: 
             <input type="text" name="rareza">
             Marca de regulaci&oacute;n: 
@@ -54,6 +88,7 @@
                     }
             ?>
             </select>
+            <a href="javascript:openPopupIlustrador();"><img src="popups/add.png" width="20"></a>
             Imagen: 
             <input type="text" name="imagen">
             Idioma: 

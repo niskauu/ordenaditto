@@ -1,23 +1,21 @@
 <script>
 function espacios_vacios() {
     alert("Debe ingresar un nuevo nombre válido");
-    // window.location.replace("ingresar-categoria.php");
-    history.back();
+    window.location.replace("ingresar-categoria.php");
 }
 function ya_existe() {
     alert("Esta categoría ya existe");
-    // window.location.replace("ingresar-categoria.php");
-    history.back();
+    window.location.replace("ingresar-categoria.php");
 }
 function correcto() {
     alert("Se ha ingresado la nueva categoría");
     // window.location.replace("../dashboard.php");
-    history.back();
+    window.close();
 }
 </script>
 <?php
     session_start();
-    include_once('../../php/conectar.php');
+    include_once('../../../php/conectar.php');
     if (! empty($_POST)) {
         if (isset($_POST['nombre']) && strlen(trim($_POST['nombre'])) > 0){
             $existe_la_categoria = pg_exec("select * from buscar_categoria('".$_POST['nombre']."')") or die('Consulta fallida');

@@ -1,15 +1,18 @@
 <script>
 function espacios_vacios() {
     alert("Debe rellenar todos los campos con datos validos");
-    window.location.replace("ingresar-carta.php");
+    // window.location.replace("ingresar-carta.php");
+    history.back();
 }
 function ya_existe() {
     alert("Esta carta ya existe");
-    window.location.replace("ingresar-carta.php");
+    // window.location.replace("ingresar-carta.php");
+    history.back();
 }
 function correcto() {
     alert("Se ha ingresado la nueva carta");
-    window.location.replace("../dashboard.php");
+    // window.location.replace("../dashboard.php");
+    history.back();
 }
 </script>
 <?php
