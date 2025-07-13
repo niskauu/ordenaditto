@@ -14,18 +14,27 @@ function correcto() {
     // window.location.replace("../dashboard.php");
     history.back();
 }
+function caracteres_ilegales() {
+    alert("No se pueden utilizar ciertos símbolos ingresados");
+    // window.location.replace("ingresar-set.php");
+    history.back();
+}
 </script>
 <?php
     session_start();
     include_once('../../php/conectar.php');
     if (! empty($_POST)) {
         if (isset($_POST['nombre']) && strlen(trim($_POST['nombre'])) > 0){
-            $existe_la_serie = pg_exec("select * from buscar_serie('".$_POST['nombre']."')") or die('Consulta fallida');
-            if (pg_fetch_result($existe_la_serie,'buscar_serie') == '0') {
-                $consulta = pg_exec("select insertar_serie('".strtolower($_POST['nombre'])."','".$_SESSION['user_id']."')") or die('Consulta fallida');
-                echo "<script>correcto();</script>";
-            } else {
-                echo "<script>ya_existe();</script>";
+            if (preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['nombre']) == 0) {
+                $existe_la_serie = pg_exec("select * from buscar_serie('".$_POST['nombre']."')") or die('Consulta fallida');
+                if (pg_fetch_result($existe_la_serie,'buscar_serie') == '0') {
+                    $consulta = pg_exec("select insertar_serie('".strtolower($_POST['nombre'])."','".$_SESSION['user_id']."')") or die('Consulta fallida');
+                    echo "<script>correcto();</script>";
+                } else {
+                    echo "<script>ya_existe();</script>";
+                }
+            }else {
+                echo "<script>caracteres_ilegales();</script>";
             }
         } else {
             echo "<script>espacios_vacios();</script>";

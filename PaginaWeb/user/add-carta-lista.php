@@ -6,6 +6,12 @@
 <html>
     <head>
         <title>Ordenaditto</title>
+        <style>
+            .visualizador{
+                display: flex;
+                padding-top: 10px;
+            }
+        </style>
     </head>
     <h1>Ordenaditto</h1>
     <a href="dashboard.php">Inicio</a>
@@ -20,8 +26,8 @@
         <?php 
             $consulta = pg_exec("select id, nombre, imagen from mostrar_cartas() where id='".$_POST['idcarta']."';") or die("Consulta fallida");
             $contenido = pg_fetch_assoc($consulta);
-            echo "<img src='".$contenido['imagen']."' width='300'>";
-            echo "Agregando la carta con ID: ".$_POST['idcarta'];
+            echo "<div class='visualizador'><img src='".$contenido['imagen']."' width='300'></div>";
+            echo "<p>Agregando la carta con ID: ".$_POST['idcarta']."</p>";
             $estampados = pg_exec("select distinct estampado from mostrar_cartas() where id='".$_POST['idcarta']."';") or die("Consulta fallida");
             echo "Impresi&oacute;n: ";
             echo "<form action='add-carta-lista-check.php' method='post'>
@@ -50,5 +56,5 @@
 
         ?>
         </div>
-        <a href="../user/explore.php">Volver</a>
+        <a href="javascript:history.back();">Volver</a>
 </html>

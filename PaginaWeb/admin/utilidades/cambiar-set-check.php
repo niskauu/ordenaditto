@@ -12,6 +12,10 @@ function no_hay_set() {
     alert("Primero debe crear y seleccionar un set para modificar");
     window.location.replace("../dashboard.php");
 }
+function no_hay_datos() {
+    alert("Primero debe crear y seleccionar un set y una serie para modificar");
+    window.location.replace("../dashboard.php");
+}
 </script>
 <?php
     session_start();
@@ -27,6 +31,8 @@ function no_hay_set() {
         } else {
             echo "<script>no_hay_set();</script>";
         }
+    } else {
+        echo "<script>no_hay_datos();</script>";
     }
 
 ?>

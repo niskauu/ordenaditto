@@ -14,6 +14,11 @@ function correcto() {
     // window.location.replace("../dashboard.php");
     history.back();
 }
+function caracteres_ilegales() {
+    alert("No se pueden utilizar ciertos símbolos ingresados");
+    // window.location.replace("ingresar-set.php");
+    history.back();
+}
 </script>
 <?php
     session_start();
@@ -29,22 +34,31 @@ function correcto() {
             isset($_POST['imagen']) && strlen(trim($_POST['imagen'])) > 0 &&
             isset($_POST['idioma']) && strlen(trim($_POST['idioma'])) > 0 &&
             isset($_POST['estampado']) && strlen(trim($_POST['estampado'])) > 0){
-            $existe_la_carta = pg_exec("select * from buscar_carta_en_sistema('".$_POST['id']."','".$_POST['estampado']."','".$_POST['idioma']."')") or die('Consulta fallida');
-            if (pg_fetch_result($existe_la_carta,'buscar_carta_en_sistema') == '0') {
-                $consulta = pg_exec("select insertar_carta('".strtolower($_POST['id'])."',
-                '".strtolower($_POST['nombre'])."',
-                '".strtolower($_POST['set'])."',
-                '".strtolower($_POST['categoria'])."',
-                '".strtolower($_POST['ilustrador'])."',
-                '".strtolower($_POST['rareza'])."',
-                '".strtolower($_POST['marcaderegulacion'])."',
-                '".$_POST['imagen']."',
-                '".strtolower($_POST['idioma'])."',
-                '".strtolower($_POST['estampado'])."',
-                '".$_SESSION['user_id']."')") or die('Consulta fallida');
-                echo "<script>correcto();</script>";
+            if (preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['id']) == 0 &&
+                preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['nombre']) == 0 &&
+                preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['rareza']) == 0 &&
+                preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['marcaderegulacion']) == 0 &&
+                preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['idioma']) == 0 &&
+                preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['estampado']) == 0) {
+                $existe_la_carta = pg_exec("select * from buscar_carta_en_sistema('".$_POST['id']."','".$_POST['estampado']."','".$_POST['idioma']."')") or die('Consulta fallida');
+                if (pg_fetch_result($existe_la_carta,'buscar_carta_en_sistema') == '0') {
+                    $consulta = pg_exec("select insertar_carta('".strtolower($_POST['id'])."',
+                    '".strtolower($_POST['nombre'])."',
+                    '".strtolower($_POST['set'])."',
+                    '".strtolower($_POST['categoria'])."',
+                    '".strtolower($_POST['ilustrador'])."',
+                    '".strtolower($_POST['rareza'])."',
+                    '".strtolower($_POST['marcaderegulacion'])."',
+                    '".$_POST['imagen']."',
+                    '".strtolower($_POST['idioma'])."',
+                    '".strtolower($_POST['estampado'])."',
+                    '".$_SESSION['user_id']."')") or die('Consulta fallida');
+                    echo "<script>correcto();</script>";
+                } else {
+                    echo "<script>ya_existe();</script>";
+                }
             } else {
-                echo "<script>ya_existe();</script>";
+                echo "<script>caracteres_ilegales();</script>";
             }
         } else {
             echo "<script>espacios_vacios();</script>";

@@ -14,6 +14,11 @@ function correcto() {
     // window.location.replace("../dashboard.php");
     history.back();
 }
+function caracteres_ilegales() {
+    alert("No se pueden utilizar ciertos símbolos ingresados");
+    // window.location.replace("ingresar-set.php");
+    history.back();
+}
 </script>
 <?php
     session_start();
@@ -21,12 +26,16 @@ function correcto() {
     if (! empty($_POST)) {
         if (isset($_POST['nombre']) && strlen(trim($_POST['nombre'])) > 0 &&
             isset($_POST['rrss']) && strlen(trim($_POST['rrss'])) > 0){
-            $existe_el_ilustrador = pg_exec("select * from buscar_ilustrador('".$_POST['nombre']."')") or die('Consulta fallida');
-            if (pg_fetch_result($existe_el_ilustrador,'buscar_ilustrador') == '0') {
-                $consulta = pg_exec("select insertar_ilustrador('".strtolower($_POST['nombre'])."','".strtolower($_POST['rrss'])."','".$_SESSION['user_id']."')") or die('Consulta fallida');
-                echo "<script>correcto();</script>";
-            } else {
-                echo "<script>ya_existe();</script>";
+            if (preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['nombre']) == 0 && preg_match('/[#$%^*()+=\\[\]\';,.\/{}|":<>?~\\\\]/', $_POST['rrss']) == 0) {    
+                $existe_el_ilustrador = pg_exec("select * from buscar_ilustrador('".$_POST['nombre']."')") or die('Consulta fallida');
+                if (pg_fetch_result($existe_el_ilustrador,'buscar_ilustrador') == '0') {
+                    $consulta = pg_exec("select insertar_ilustrador('".strtolower($_POST['nombre'])."','".strtolower($_POST['rrss'])."','".$_SESSION['user_id']."')") or die('Consulta fallida');
+                    echo "<script>correcto();</script>";
+                } else {
+                    echo "<script>ya_existe();</script>";
+                }
+            }else {
+                echo "<script>caracteres_ilegales();</script>";
             }
         } else {
             echo "<script>espacios_vacios();</script>";
