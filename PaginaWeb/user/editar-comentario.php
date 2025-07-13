@@ -27,6 +27,7 @@ function volver() {
         <div>
             <?php
                 echo "<input name=idcarta type=hidden value='".$_POST['idcarta']."'>
+                      <input name=contenidooriginal type=hidden value='".$_POST['contenido']."'>
                       <textarea name='contenido' rows='5' cols='50'>".$_POST['contenido']."</textarea>
                       <input type='hidden' name='idcomentario' value='".$_POST['idcomentario']."'/>";
             ?>

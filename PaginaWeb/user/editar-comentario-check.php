@@ -11,14 +11,24 @@ function espacios_vacios() {
         echo "window.location.replace('visualizator.php?id=".$_POST['idcarta']."')";
     ?>
 }
+function no_editado() {
+    alert("No se ha editado el comentario");
+    <?php
+        echo "window.location.replace('visualizator.php?id=".$_POST['idcarta']."')";
+    ?>
+}
 </script>
 <?php
     session_start();
     include_once('../php/conectar.php');
     if (! empty($_POST)) {
         if (isset($_POST['contenido']) && strlen(trim($_POST['contenido'])) > 0){
-        $consulta = pg_exec("select editar_comentario(".$_POST['idcomentario'].",'".$_POST['contenido']." (editado)')") or die('Consulta fallida');
-        echo "<script>insertar();</script>";
+            if ($_POST['contenidooriginal'] != $_POST['contenido']) {
+                $consulta = pg_exec("select editar_comentario(".$_POST['idcomentario'].",'".$_POST['contenido']." (editado)')") or die('Consulta fallida');
+                echo "<script>insertar();</script>";
+            } else {
+                echo "<script>no_editado();</script>";
+            }
         } else {
             echo "<script>espacios_vacios();</script>";
         }
