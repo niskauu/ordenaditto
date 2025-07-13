@@ -671,29 +671,32 @@ language plpgsql;
 create or replace function modificar_atributos_usuario(
 	nuevodato text,
 	atributo text,
-	id usuario.nombreusuario%type
+	id usuario.nombreusuario%type,
+	correo usuario.correo%type,
+	tipo usuario.tipo%type
 ) returns void as
 $$
 begin
 	case atributo
 		when 'nombreusuario' then
 			update usuario as u set nombreusuario=cast($1 as varchar(30))
-			where u.nombreusuario=$3;
+			where u.nombreusuario=$3 and u.correo=$4 and u.tipo=$5;
 		when 'nombrevisual' then 
 			update usuario as u set nombrevisual=cast($1 as varchar(30))
-			where u.nombreusuario=$3;
+			where u.nombreusuario=$3 and u.correo=$4 and u.tipo=$5;
 		when 'correo' then 
 			update usuario as u set correo=cast($1 as varchar(255))
-			where u.nombreusuario=$3;
+			where u.nombreusuario=$3 and u.correo=$4 and u.tipo=$5;
 		when 'avatar' then
 			update usuario as u set avatar=cast($1 as varchar(255))
-			where u.nombreusuario=$3;
+			where u.nombreusuario=$3 and u.correo=$4 and u.tipo=$5;
 		else
 			raise notice 'Debe especificar un atributo';
 	end case;
 end;
 $$
 language plpgsql;
+
 
 create or replace function modificar_atributos_lista(
 	nuevodato text,
